@@ -1,0 +1,24 @@
+<ion-content>
+	<div class="login-page custom-form">
+		<div data-fader class="alert alert-danger" data-ng-if="error">
+			{{error}}<i class="ion-close" data-ng-click="clearErrors($event)"></i>
+		</div>
+		<form class="form-area" data-ng-submit="login($event)">
+			<div class="header-label">{{'Sign in to'|translate}} RingByName</div>
+			<input type="email" placeholder="{{'User'|translate}}" data-ng-model="data.username" data-app-autofill />
+			<input type="password" placeholder="{{'Password'|translate}}" data-ng-model="data.password" data-app-autofill />
+			<button class="button button-block">{{'Sign In'|translate}}</button>
+			<div class="row">
+				<div class="col">
+					<label>
+						<input type="checkbox" data-ng-model="data.stay_sign_in">
+						{{'Stay signed in?'|translate}}
+					</label>
+				</div>
+				<div class="col">
+					<a data-ng-href="#/auth/reset-password" class="pull-right">{{'Reset Password'|translate}}</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</ion-content>
