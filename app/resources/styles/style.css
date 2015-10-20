@@ -1,0 +1,20 @@
+.img-responsive {
+	max-width: 200px;
+	padding: 16px;
+}
+.picture {
+	max-width: 232px;
+}
+.navbar {
+	min-height: 100px;
+}
+@media (min-width: 768px){
+	.sidebar {
+		margin-top: 101px;
+	}
+}
+@media (MAX-width: 768px){
+	.logo {
+		display: none !important;
+	}
+} 

@@ -1,12 +1,20 @@
 //Declare app level module which depends on filters, and services
-var SFApplicationAuth = angular.module('SFApplicationAuth.Auth', []);
+var SFApplicationAuth = angular.module('SFApplicationAuth.Auth',[]);
 
-SFApplicationAuth.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
+SFApplicationAuth.config(
+	[
+		'$stateProvider',
+		'$urlRouterProvider',
+	function (
+		$stateProvider,
+		$urlRouterProvider
+	) {
+	console.log("inciando bootstrap auth");
 
 	$stateProvider.state('auth', {
 		url: '/auth',
 		abstract: true,
-		templateUrl: 'application/auth/partials/template.html',
+		templateUrl: 'modules/auth/partials/template.html',
 		data: {
 			isPublic: true
 		}
@@ -14,61 +22,28 @@ SFApplicationAuth.config(['$stateProvider', '$urlRouterProvider', function($stat
 
 	$stateProvider.state('auth.login', {
 		url: '/login',
-		views: {
-			'authContent': {
-				templateUrl: 'application/auth/partials/login.html',
-				controller: 'Auth.Index.Index'
-			}
-		}
+			templateUrl: 'modules/auth/partials/login.html',
+			controller: 'AuthController'
 	});
 
 	$stateProvider.state('auth.logout', {
 		url: '/logout',
-		views: {
-			'authContent': {
-				controller: ['$state', 'authFactory', '$rootScope', 'applicationData', '$interval', function($state, authFactory, $rootScope, applicationData, $interval) {
-					/**
-					 * Call auth to clean session
-					 */
-					authFactory.clearSession();
-
-					/**
-					 * Unbind all events from Pusher.
-					 */
-					$interval.cancel($rootScope.pusherInterval);
-					$rootScope.pusher.unsubscribe(applicationData.userId);
-					$rootScope.pusher.unsubscribe(applicationData.accountId);
-
-					/**
-					 * Redirect to login page.
-					 */
-					$state.go('auth.login');
-				}]
-			}
-		}
+		controller: 'LogoutController'
 	});
 
 	$stateProvider.state('auth.reset-password', {
 		url: '/reset-password',
-		views: {
-			'authContent': {
-				templateUrl: 'application/auth/partials/reset-password.html',
-				controller: 'Auth.Index.Index'
-			}
-		}
+		templateUrl: 'application/auth/partials/reset-password.html',
+		controller: 'AuthController'
 	});
 }]);
 
-SFApplicationAuth.run(['$rootScope', '$state', '$location', '$log', 'authFactory', '$translate', function($rootScope, $state, $location, $log, authFactory, $translate) {
+SFApplicationAuth.run(['$rootScope', '$state', '$location', '$log', 'authFactory', function($rootScope, $state, $location, $log, authFactory) {
 
 	$log.log('Running Auth...');
 
 	$rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
 		$log.log('$stateChangeStart');
-
-		$ionicLoading.show({
-			template: $translate('Loading') + '...'
-		});
 
 		if( toState && ( "data" in toState ) === true && ( "isPublic" in toState.data ) === true && toState.data.isPublic == true ) {
 			$log.log( 'Public page...' );
@@ -85,6 +60,7 @@ SFApplicationAuth.run(['$rootScope', '$state', '$location', '$log', 'authFactory
 				 */
 				event.preventDefault();
 
+				$log.log( 'Fazendo loggof' );
 				/**
 				 * Redirect to login
 				 */
@@ -97,7 +73,15 @@ SFApplicationAuth.run(['$rootScope', '$state', '$location', '$log', 'authFactory
 		$log.log('$stateChangeSuccess');
 	});
 
-	$rootScope.$on('$stateChangeError', function(next, current) {
+	$rootScope.$on('$stateChangeError', function( 
+			event, 
+			toState, 
+			toParams, 
+			fromState, 
+			fromParams, 
+			rejection) {
+		
+		
 		$log.log('$stateChangeError');
 	});
 

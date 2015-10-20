@@ -1,4 +1,4 @@
-(function( doc, ng, app ) {
+(function( doc, ng, us, app ) {
 
 	"use strict";
 
@@ -38,4 +38,4 @@
 		};
 	}]);
 
-})( document, angular, SFApplication );
+})( document, angular, _, SFApplication );

@@ -3,17 +3,18 @@
 	"use strict";
 
 	/* Application Main Controller */
-	app.controller(
-		'AppMainController', 
+	app.controller('AppMainController', 
 		[
 			'$scope',
 			'$rootScope',
 			'$position',
-			function(
-				$scope,
-				$rootScope, 
-				$position) {
-			}
+		function(
+			$scope,
+			$rootScope, 
+			$position
+		) {
+				
+		}
 		]
 	);
 

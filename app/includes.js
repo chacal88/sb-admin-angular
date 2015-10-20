@@ -12,24 +12,36 @@ var files = {
 			"bower_components/Chart.js/Chart.min.js",
 			"bower_components/angular-webstorage/angular-webstorage.min.js",
 			"bower_components/angular-translate/angular-translate.min.js",
-			"resources/js/sb-admin-2.js", "modules/overrides.js" 
+			"resources/js/sb-admin-2.js",
+			"bower_components/angular-cookies/angular-cookies.js",
+			"modules/overrides.js",
+			"resources/js/underscore/underscore-min.js",
+			"resources/js/moment.min.js"
 			],
 	"bootstrap" : [ 
-			"modules/main/application/bootstrap.js",
-			//"modules/auth/application/bootstrap.js"
+			"modules/auth/application/bootstrap.js",
+			"modules/main/application/bootstrap.js"
 			],
 	"factories" : [ 
-			//"modules/main/application/factories/interceptor.js",
-			//"modules/auth/application/factories/auth.js"
+			"modules/main/application/factories/interceptor.js",
+			"modules/main/application/factories/socket.js",
+			"modules/auth/application/factories/auth.js"
 			],
 	"constants" : [ 
-			"modules/main/application/constants/constants.js"
+			"modules/main/application/constants/constants.js",
+			"modules/main/application/controllers/application.js"
 			],
 	"directives" : [
-			//"modules/auth/application/directives/fader.js"
+			"modules/auth/application/directives/fader.js"
 			],
+	"controllers" : [
+			"modules/auth/application/controllers/auth/index.js",
+			"modules/main/application/controllers/profile/index.js",
+			"modules/auth/application/controllers/auth/logout.js"],
 	"services" : [
-			//"modules/auth/application/services/auth/index.js"
+			"modules/auth/application/services/auth/index.js",
+			"modules/main/application/services/user/reset-password.js",
+			"modules/main/application/services/user/index.js"
 			]
 };
 var readSection = function(section) {
@@ -43,4 +55,5 @@ readSection("bootstrap");
 readSection("factories");
 readSection("constants");
 readSection("directives");
+readSection("controllers");
 readSection("services");

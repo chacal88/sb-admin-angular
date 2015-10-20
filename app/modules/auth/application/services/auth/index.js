@@ -11,9 +11,9 @@
 					data: {
 						"data": data
 					},
-					url: applicationData.apiUrl + '/auth'
+					url: applicationData.apiUrl + '/public/auth/'
 				}).then(function(response) {
-					if ( response && "data" in response && response && "data" in response && typeof response.data === 'object' && response.status === 200 ) {
+					if ( response && "data" in response && response && "data" in response && typeof response.data === 'object' && response.status === 201 ) {
 						return response.data;
 					} else {
 						//invalid response
@@ -51,7 +51,7 @@
 					},
 					url: applicationData.apiUrl + '/become',
 					headers: {
-						'X-Session-Id': sessionId
+						'X-Token': sessionId
 					}
 				}).then(function(response) {
 					if ( response && "data" in response && response && "data" in response && typeof response.data === 'object' && response.status === 200 ) {
@@ -69,7 +69,7 @@
 				return $http({
 					method: 'GET',
 					headers: {
-						'X-Session-Id': sessionId
+						'X-Token': sessionId
 					},
 					url: applicationData.apiUrl + '/session/' + sessionId
 				}).then(function(response) {

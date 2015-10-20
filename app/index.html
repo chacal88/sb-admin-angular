@@ -2,7 +2,7 @@
 <html class="no-js">
 	<head>
 		<meta charset="utf-8">
-		<title></title>
+		<title>Super Frota</title>
 		<meta name="description" content="">
 		<meta name="viewport" content="width=device-width">
 		<!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
@@ -13,6 +13,7 @@
 		<!-- endbuild -->
 		<!-- build:css(.tmp) styles/main.css -->
 		<link rel="stylesheet" href="resources/styles/main.css">
+		<link rel="stylesheet" href="resources/styles/style.css">
 		<link rel="stylesheet" href="resources/styles/sb-admin-2.css">
 		<link rel="stylesheet" href="resources/styles/timeline.css">
 		<link rel="stylesheet" href="bower_components/metisMenu/dist/metisMenu.min.css">
@@ -27,6 +28,12 @@
 			ga('create', 'UA-XXXXX-X');
 			ga('send', 'pageview');
 		</script>
+
+	<script type="text/javascript">
+		var apiUrl = 'http://localhost:8080/api/v1';
+		var webappUrl = 'http://localhost:3333/#/';
+		var GOOGLE_TRACKING_ID = null;
+	</script>
 	</head>
 	<body>
 		<div ng-app="SFApplication">

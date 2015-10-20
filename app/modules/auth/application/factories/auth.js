@@ -1,16 +1,26 @@
-(function( ng,  app ) {
+(function( ng, us, app ) {
 
 	"use strict";
 
 	/* Factory Activity */
-	app.factory('authFactory', [
-		'$rootScope', '$q', '$http', 
-		'$log', 'webStorage', 'authIndexService', 
-		'applicationData', 'userResetPasswordService',  '$translate', 
+	app.factory('authFactory', 
+		['$rootScope', 
+		 '$q', 
+		 '$http',
+		 '$log',
+		 'webStorage',
+		 'authIndexService',
+		 'applicationData',
+		 'userResetPasswordService', 
 	function(
-		$rootScope, $q, $http, $log, 
-		webStorage, authIndexService, applicationData, 
-		userResetPasswordService, $translate) {
+		$rootScope, 
+		$q,
+		$http,
+		$log,
+		webStorage,
+		authIndexService,
+		applicationData,
+		userResetPasswordService){
 
 		var prefixApplication = 'super-frota';
 		var userDataRealm = 'sf-storage-user-data';
@@ -21,23 +31,25 @@
 		 */
 		var dataApplication = webStorage.local.get( prefixApplication );
 		if( dataApplication && ng.isObject( dataApplication ) ) {
-			applicationData.userId = dataApplication.userId;
-			applicationData.userLanguage = dataApplication.userLanguage;
-			applicationData.sessionId = dataApplication.sessionId;
-			applicationData.company = dataApplication.company;
-			applicationData.permissions = dataApplication.permissions;
-			applicationData.pusher.apiKey = dataApplication.pusher.apiKey;
+			applicationData.userId = dataApplication.auth.info.user.id;
+			applicationData.userEmail = dataApplication.auth.info.user.email;
+			applicationData.userNome = dataApplication.auth.info.user.name;
+			applicationData.sessionId = dataApplication.auth.info.user.token;				
+			applicationData.permissions = dataApplication.auth.info.user.recursos.map(function(permission) { return permission.toString().toLowerCase(); });
 			applicationData.auth = dataApplication.auth;
 		}
 
 		var checkIsLogged = function() {
+			
 			var data = webStorage.local.get( prefixApplication );
 			if( ng.isObject( data ) ) {
 				/**
 				 * Updating http headers
 				 */
-				$http.defaults.headers.common['X-Session-Id'] = data.sessionId;
+				console.log("session1",data.sessionId);
+				$http.defaults.headers.common['X-Session-Token'] = data.sessionId;
 
+				console.log("checando",$http.defaults.headers);
 				/**
 				 * Notify application
 				 */
@@ -55,7 +67,7 @@
 			/**
 			 * Remove header
 			 */
-			delete $http.defaults.headers.common['X-Session-Id'];
+			delete $http.defaults.headers.common['X-Session-Token'];
 
 			/**
 			 * Clear any session storage
@@ -68,23 +80,11 @@
 			return false;
 		};
 
-		/**
-		 * Check if is super user.
-		 */
-		var checkIsSuperUser = function() {
-			return webStorage.local.get( prefixSuperUserApplication ) != null;
-		};
-
 		var hasPermission = function(permission) {
 			return ( dataApplication && 'permissions' in applicationData && us.contains( applicationData.permissions, permission ) ? true : false );
 		};
 
 		var successLoginResponse = function(response) {
-			/**
-			 * Hide loading.
-			 */
-			$ionicLoading.hide();
-
 			/**
 			 * Clear any session storage
 			 */
@@ -94,24 +94,16 @@
 			 * @todo Authentication returns http code 203 instead of 500
 			 * Returning a promise
 			 */
-			if ( typeof response.data === 'object' && response.code === 200 ) {
-
-				/**
-				 * Do not log in webapp if is a super user.
-				 */
-				if( response.data.user.permissions.indexOf("super_user") != -1 ) {
-					return response;
-				}
+			if ( typeof response.data === 'object' && response.code === 201 ) {
 
 				/**
 				 * Updating applicationData
 				 */
-				applicationData.userId = response.data.account_user.id;
-				applicationData.userLanguage = response.data.account_user.language;
-				applicationData.sessionId = response.data.session_id;
-				applicationData.company = response.data.account.contact_info.user.company;
-				applicationData.permissions = response.data.user.permissions.map(function(permission) { return permission.toString().toLowerCase(); });
-				applicationData.pusher.apiKey = response.data.account.pusher_application_info.auth_key;
+				applicationData.userId = response.data.info.user.id;
+				applicationData.userEmail = response.data.info.user.email;
+				applicationData.userNome = response.data.info.user.name;
+				applicationData.sessionId = response.data.info.user.token;				
+				applicationData.permissions = response.data.info.user.recursos.map(function(permission) { return permission.toString().toLowerCase(); });
 				applicationData.auth = response.data;
 
 				/**
@@ -127,7 +119,9 @@
 				/**
 				 * Updating http headers
 				 */
-				$http.defaults.headers.common['X-Session-Id'] = response.data.session_id;
+
+				console.log("session2",applicationData.sessionId);
+				$http.defaults.headers.common['X-Session-Token'] = applicationData.sessionId;
 
 				/**
 				 * Status of session
@@ -156,48 +150,36 @@
 			/**
 			 * Updating applicationData for SuperUser.
 			 */
-			applicationData.superUser.userId = response.data.account_user.id;
-			applicationData.superUser.userLanguage = response.data.account_user.language;
-			applicationData.superUser.sessionId = response.data.session_id;
-			applicationData.superUser.company = response.data.account.contact_info.user.company;
-			applicationData.superUser.permissions = response.data.user.permissions.map(function(permission) { return permission.toString().toLowerCase(); });
-			applicationData.superUser.pusher.apiKey = response.data.account.pusher_application_info.auth_key;
-			applicationData.superUser.auth = response.data;
-
+			applicationData.userId = response.data.info.user.id;
+			applicationData.userEmail = response.data.info.user.email;
+			applicationData.userNome = response.data.info.user.name;
+			applicationData.sessionId = response.data.info.user.token;				
+			applicationData.permissions = response.data.info.user.recursos.map(function(permission) { return permission.toString().toLowerCase(); });
+			applicationData.auth = response.data;
 
 			/**
 			 * Store the new application data session
 			 */
-			webStorage.local.add( prefixSuperUserApplication, applicationData.superUser );
+			webStorage.local.set( prefixSuperUserApplication, applicationData.superUser );
 		}
 
 		var errorLoginResponse = function(response) {
-			/**
-			 * Hide loading.
-			 */
-			$ionicLoading.hide();
 
 			//invalid response
 			return $q.reject(response);
 		};
 
-		var become = function( sessionId, userId, accountId ) {
-			return $q.all([
-					authIndexService.become( sessionId, userId, accountId ),
-					authIndexService.session( sessionId )
-				]).then( function (response){
-					successLoginResponse( response[0] );
-					successSessionResponse( response[1] );
-				});
-		};
+//		var become = function( sessionId, userId, accountId ) {
+//			return $q.all([
+//					authIndexService.become( sessionId, userId, accountId ),
+//					authIndexService.session( sessionId )
+//				]).then( function (response){
+//					successLoginResponse( response[0] );
+//					successSessionResponse( response[1] );
+//				});
+//		};
 
 		var login = function( data ) {
-			/**
-			 * Show loading.
-			 */
-			$ionicLoading.show({
-				template: $translate('Loading') + '...'
-			});
 
 			return authIndexService.login( data ).then( successLoginResponse, errorLoginResponse );
 		};
@@ -228,7 +210,7 @@
 			/**
 			 * Remove header
 			 */
-			delete $http.defaults.headers.common['X-Session-Id'];
+			delete $http.defaults.headers.common['X-Session-Token'];
 
 			/**
 			 * Clear any session storage
@@ -251,7 +233,7 @@
 		};
 
 		var saveToStorage = function( data ) {
-			webStorage.local.add( prefixApplication, data );
+			webStorage.local.set( prefixApplication, data );
 		};
 
 		var clearLocalWebStorage = function() {
@@ -279,12 +261,12 @@
 			logout: logout,
 			clearSession: clearSession,
 			resetPassword: resetPassword,
-			become: become,
-			checkIsSuperUser: checkIsSuperUser,
+		//	become: become,
+		//	checkIsSuperUser: checkIsSuperUser,
 			saveToStorage: saveToStorage,
 			saveLastSuccessfulLogin: saveLastSuccessfulLogin,
 			getLastSuccessfulLogin: getLastSuccessfulLogin
 		};
 	}]);
 
-})( angular, SFApplicationAuth );
+})( angular, _, SFApplicationAuth );
